@@ -16,7 +16,7 @@ namespace frmPrincipal
 
                 // Asegúrate de que esta línea no esté fallando
 
-                Application.Run(new frmPrincipal());
+                Application.Run(new frmProductos());
             }
             catch (Exception ex)
             {
