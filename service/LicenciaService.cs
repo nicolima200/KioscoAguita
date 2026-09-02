@@ -151,6 +151,8 @@ namespace service
                 return EstadoLicencia.Invalida;
 
             RespuestaActivar resultado = await respuesta.Content.ReadFromJsonAsync<RespuestaActivar>();
+            if (!string.IsNullOrWhiteSpace(resultado?.Token))
+                GuardarToken(resultado.Token);
             return EstadoLicencia.Renovada;
         }
     }

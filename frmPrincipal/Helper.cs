@@ -105,8 +105,8 @@ namespace frmPrincipal
                     else
                     {
                         using (FileStream fs = new FileStream(ruta, FileMode.Open, FileAccess.Read))
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            MemoryStream ms = new MemoryStream();
                             fs.CopyTo(ms);
                             ms.Position = 0;
                             string extension = Path.GetExtension(ruta).ToLower();
