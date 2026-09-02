@@ -700,15 +700,18 @@ namespace frmPrincipal
             if (e.KeyCode == Keys.Oemplus || e.KeyCode == Keys.Add)
             {
                 e.SuppressKeyPress = true;
-                tbxCantidad.Text = (double.Parse(tbxCantidad.Text) + 1).ToString();
+                if (double.TryParse(tbxCantidad.Text, out double valAdd))
+                    tbxCantidad.Text = (valAdd + 1).ToString();
+                else
+                    tbxCantidad.Text = "1";
             }
             if (e.KeyCode == Keys.OemMinus || e.KeyCode == Keys.Subtract)
             {
                 e.SuppressKeyPress = true;
-                {
-                    if (double.Parse(tbxCantidad.Text) > 1)
-                        tbxCantidad.Text = (double.Parse(tbxCantidad.Text) - 1).ToString();
-                }
+                if (double.TryParse(tbxCantidad.Text, out double valSub) && valSub > 1)
+                    tbxCantidad.Text = (valSub - 1).ToString();
+                else if (!double.TryParse(tbxCantidad.Text, out _))
+                    tbxCantidad.Text = "1";
 
             }
 
