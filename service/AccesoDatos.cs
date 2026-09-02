@@ -10,9 +10,6 @@ namespace service
         private SqliteCommand comando;
         private SqliteDataReader lector;
 
-        private string rutaBaseDeDatos = AppDomain.CurrentDomain.BaseDirectory;
-        private string nombreBaseDeDatos = "DBKiosco";
-
         private string DbPath= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DBKiosco");
         
         public SqliteDataReader Lector => lector;
@@ -43,25 +40,28 @@ namespace service
                 conexion.Open();
                 lector = comando.ExecuteReader();
             }
-            catch (SqliteException e)
+            catch (SqliteException)
             {
-                
+                conexion.Close();
                 throw;
             }
         }
 
         public void ejecutarAccion()
         {
-                comando.Connection = conexion;
+            comando.Connection = conexion;
             try
             {
                 conexion.Open();
                 comando.ExecuteNonQuery();
             }
-            catch (System.Exception)
+            catch
             {
-
                 throw;
+            }
+            finally
+            {
+                conexion.Close();
             }
         }
 
@@ -72,9 +72,9 @@ namespace service
             {
                 conexion.Open();
                 return Convert.ToInt32(comando.ExecuteScalar());
-            }catch(Exception ex)
+            }catch
             {
-                throw ex;
+                throw;
             }
             finally
             {
