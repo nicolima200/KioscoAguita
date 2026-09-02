@@ -123,8 +123,10 @@ namespace service
                 if (!modoRecuperar)
                     datos.setConsulta(consulta.SqlEliminarLogicoId);
                 else
+                {
                     datos.setConsulta(consulta.SqlRestaurarLogicoId);
-                    datos.setParametro("@id", id);
+                }
+                datos.setParametro("@id", id);
 
                 datos.ejecutarAccion();
             }
@@ -196,7 +198,7 @@ namespace service
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message + producto.Id.ToString());
+                throw new Exception($"Error leyendo producto Id={producto.Id}: {ex.Message}", ex);
             }
             
         }

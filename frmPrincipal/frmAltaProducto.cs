@@ -280,7 +280,7 @@ namespace frmPrincipal
         {
             if (archivo == null) return true;
 
-            string carpeta = ConfigurationManager.AppSettings["images-folder"];
+            string carpeta = ConfigurationManager.AppSettings["images-folder"] ?? "imágenes";
             string nombreArchivo = archivo.SafeFileName;
             string carpetaArchivo = Path.GetDirectoryName(archivo.FileName)+"\\";
             string rutaAchivoNuevo = Path.Combine(carpeta, nombreArchivo);
@@ -348,7 +348,7 @@ namespace frmPrincipal
             string urlLimpia = uri.AbsolutePath;
 
             //Carpeta de destino
-            string carpetaDestino = ConfigurationManager.AppSettings["images-folder"];
+            string carpetaDestino = ConfigurationManager.AppSettings["images-folder"] ?? "imágenes";
             string directorioBase = AppDomain.CurrentDomain.BaseDirectory;
             string rutaCompleta = Path.Combine(directorioBase, carpetaDestino);
 
