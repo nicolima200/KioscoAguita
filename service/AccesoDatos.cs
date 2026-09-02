@@ -19,7 +19,7 @@ namespace service
 
         public AccesoDatos()
         {
-            conexion = new SqliteConnection($"Data Source ={DbPath}");
+            conexion = new SqliteConnection($"Data Source ={DbPath};Foreign Keys=True");
             comando = new SqliteCommand();
         }
 
