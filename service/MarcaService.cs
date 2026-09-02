@@ -26,7 +26,7 @@ namespace service
 
                 return listaMarcas;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }

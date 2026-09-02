@@ -28,7 +28,7 @@ namespace service
 
                 return listaCategorias;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
