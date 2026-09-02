@@ -275,7 +275,6 @@
             this.tbxNombreCliente.Name = "tbxNombreCliente";
             this.tbxNombreCliente.Size = new System.Drawing.Size(227, 39);
             this.tbxNombreCliente.TabIndex = 7;
-            this.tbxNombreCliente.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             // 
             // lblNombreCliente
             // 
@@ -283,11 +282,11 @@
             this.lblNombreCliente.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.lblNombreCliente.Font = new System.Drawing.Font("Cambria", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNombreCliente.ForeColor = System.Drawing.SystemColors.Window;
-            this.lblNombreCliente.Location = new System.Drawing.Point(9, 8);
+            this.lblNombreCliente.Location = new System.Drawing.Point(137, 6);
             this.lblNombreCliente.Name = "lblNombreCliente";
-            this.lblNombreCliente.Size = new System.Drawing.Size(156, 34);
+            this.lblNombreCliente.Size = new System.Drawing.Size(123, 34);
             this.lblNombreCliente.TabIndex = 7;
-            this.lblNombreCliente.Text = "Referencia:";
+            this.lblNombreCliente.Text = "Nombre:";
             // 
             // lblAvisoEfectivo
             // 
