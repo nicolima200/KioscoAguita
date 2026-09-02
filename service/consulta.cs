@@ -11,13 +11,13 @@ namespace service
 
     private const string sqlAlta= "BEGIN; " +
         "INSERT INTO categorias (descripcion) SELECT @cat WHERE @cat IS NOT NULL AND @cat <> '' AND NOT EXISTS (SELECT 1 FROM categorias WHERE descripcion = @cat); " +
-        "INSERT INTO productos (codBarras, nombre, descripcion, categoriaId, marca, urlImagen, tipoVenta) " +
-        "VALUES (@cod, @nom, @desc, (SELECT id FROM categorias WHERE descripcion = @cat), @marca, @url, @tipo); " +
-        "INSERT INTO productos_inventario (idProducto, stock, stockMinimo, precioKiosco, precioMayorista, activo) " +
-        "VALUES (last_insert_rowid(), @sto, @stockMin, @kio, @may, @activo); " +
+        "INSERT INTO productos (codBarras, nombre, descripcion, categoriaId, marca, tipoVenta) " +
+        "VALUES (@cod, @nom, @desc, (SELECT id FROM categorias WHERE descripcion = @cat), @marca, @tipo); " +
+        "INSERT INTO productos_inventario (idProducto, stock, stockMinimo, precioKiosco, precioMayorista, activo, urlImagen) " +
+        "VALUES (last_insert_rowid(), @sto, @stockMin, @kio, @may, @activo, @url); " +
         "COMMIT;";
 
-    private const string columnasJoin = "p.id, p.codBarras, p.nombre, p.descripcion, COALESCE(c.descripcion,'') AS categoria, i.precioMayorista, i.precioKiosco, i.stock, i.stockMinimo, i.activo, p.urlImagen, p.tipoVenta, p.marca FROM productos p INNER JOIN productos_inventario i ON i.idProducto = p.id LEFT JOIN categorias c ON c.id = p.categoriaId";
+    private const string columnasJoin = "p.id, p.codBarras, p.nombre, p.descripcion, COALESCE(c.descripcion,'') AS categoria, i.precioMayorista, i.precioKiosco, i.stock, i.stockMinimo, i.activo, i.urlImagen, p.tipoVenta, p.marca FROM productos p INNER JOIN productos_inventario i ON i.idProducto = p.id LEFT JOIN categorias c ON c.id = p.categoriaId";
 
     private const string sqlBuscarCodBarras= "SELECT " + columnasJoin + " WHERE p.codBarras = @cod";
     private const string sqlBuscarCadena= "SELECT " + columnasJoin + " WHERE p.nombre LIKE @nom";
@@ -27,8 +27,8 @@ namespace service
 
     private const string sqlActualizar = "BEGIN; " +
         "INSERT INTO categorias (descripcion) SELECT @cat WHERE @cat IS NOT NULL AND @cat <> '' AND NOT EXISTS (SELECT 1 FROM categorias WHERE descripcion = @cat); " +
-        "UPDATE productos SET codBarras=@cod, nombre=@nom, descripcion=@desc, categoriaId=(SELECT id FROM categorias WHERE descripcion = @cat), urlImagen=@url, tipoVenta=@tipo, marca=@marca WHERE id = @id; " +
-        "UPDATE productos_inventario SET stock=@sto, stockMinimo=@stockMin, precioKiosco=@kio, precioMayorista=@may, activo=@activo WHERE idProducto = @id; " +
+        "UPDATE productos SET codBarras=@cod, nombre=@nom, descripcion=@desc, categoriaId=(SELECT id FROM categorias WHERE descripcion = @cat), tipoVenta=@tipo, marca=@marca WHERE id = @id; " +
+        "UPDATE productos_inventario SET stock=@sto, stockMinimo=@stockMin, precioKiosco=@kio, precioMayorista=@may, activo=@activo, urlImagen=@url WHERE idProducto = @id; " +
         "COMMIT;";
 
     private const string sqlActualizarStock = "UPDATE productos_inventario SET stock=@sto WHERE idProducto = @id";
