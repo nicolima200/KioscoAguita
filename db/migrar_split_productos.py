@@ -21,6 +21,7 @@ CREATE TABLE productos_inventario (
     precioKiosco REAL,
     precioMayorista REAL,
     activo INTEGER DEFAULT 1,
+    eliminado INTEGER DEFAULT 0,
     urlImagen TEXT
 );
 """
@@ -101,8 +102,8 @@ def main(ruta):
             'insert into productos_nuevo (id, codBarras, nombre, descripcion, categoriaId, marca, tipoVenta) values (?,?,?,?,?,?,?)',
             (pid, cod, nom, desc, cid, marca, tv))
         cur.execute(
-            'insert into productos_inventario (idProducto, stock, stockMinimo, precioKiosco, precioMayorista, activo, urlImagen) values (?,?,?,?,?,?,?)',
-            (pid, sto, stmin, kio, may, act, url))
+            'insert into productos_inventario (idProducto, stock, stockMinimo, precioKiosco, precioMayorista, activo, eliminado, urlImagen) values (?,?,?,?,?,?,?,?)',
+            (pid, sto, stmin, kio, may, act, 0, url))
 
     cur.execute('drop table productos')
     cur.execute('alter table productos_nuevo rename to productos')

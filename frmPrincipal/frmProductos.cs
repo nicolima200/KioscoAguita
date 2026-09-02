@@ -197,6 +197,7 @@ namespace frmPrincipal
             dgvPrincipal.Columns["Marca"].Visible = visibles;
             dgvPrincipal.Columns["CodBarras"].Visible = visibles;
             dgvPrincipal.Columns["Activo"].Visible = visibles;
+            dgvPrincipal.Columns["Eliminado"].Visible = visibles;
             dgvPrincipal.Columns["UrlImagen"].Visible = visibles;
             dgvPrincipal.RowHeadersVisible = visibles;
         }

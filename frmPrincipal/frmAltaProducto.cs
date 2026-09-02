@@ -229,8 +229,10 @@ namespace frmPrincipal
                         string cadenaProd = producto.CodBarras + " \"" + producto.Nombre + " " + producto.Descripcion;
                         if (producto.Activo == 1)
                             estado = "ACTIVO";
-                        else
+                        else if (producto.Eliminado == 1)
                             estado = "en la PAPELERA";
+                        else
+                            estado = "inactivo (aún no dado de alta)";
 
                         DialogResult resultado = MessageBox.Show("El producto con Codigo de barras: " + cadenaProd + "\" ya existe y está " + estado + ".\n" +
                             "¿Desea modificarlo?", "Producto existente", MessageBoxButtons.YesNo);

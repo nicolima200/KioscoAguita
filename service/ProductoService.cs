@@ -190,6 +190,7 @@ namespace service
                     producto.UrlImagen = (string)datos.Lector["urlImagen"];
 
                 producto.Marca = (string)datos.Lector["marca"];
+                producto.Eliminado = datos.Lector.GetInt32(13);
 
                 return producto;
             }

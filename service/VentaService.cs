@@ -33,6 +33,7 @@ namespace service
                             insertarDetalleVenta(transaccion,conexion,detalleVenta, idVenta);
 
                             actualizarStock(transaccion,conexion,detalleVenta);
+                            autoActivarSiDormido(transaccion,conexion,detalleVenta);
                         }
 
                         transaccion.Commit();
@@ -74,6 +75,17 @@ namespace service
 
                 comandoUpdateStock.ExecuteNonQuery();
 
+            }
+        }
+
+        private void autoActivarSiDormido(SqliteTransaction transaccion, SqliteConnection conexion, DetalleVenta detalleVenta)
+        {
+            using (SqliteCommand comando = conexion.CreateCommand())
+            {
+                comando.Transaction = transaccion;
+                comando.CommandText = consultasVenta.SqlAutoActivar;
+                comando.Parameters.AddWithValue("@idProd", detalleVenta.IdProducto);
+                comando.ExecuteNonQuery();
             }
         }
 

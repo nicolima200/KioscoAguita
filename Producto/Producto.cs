@@ -23,6 +23,7 @@ namespace dominio
         [DisplayName("Categoría")]
         public string Categoria { get; set; }
         public int Activo { get; set; }
+        public int Eliminado { get; set; }
         public string UrlImagen { get; set; }
         // Indica si el producto se puede vender por fracciones (ejemplo: 0.5 kg de manzana)
         // Valores posibles: 1 = true, 0 = false
