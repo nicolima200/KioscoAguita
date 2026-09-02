@@ -10,7 +10,7 @@ namespace service
     {
         private const string sqlInsertarVenta = "INSERT INTO Ventas (id, fecha, montoTotal, montoPago, vuelto, formaPago, referencia) VALUES (null, @fecha, @montototal, @montopago, @vuelto, @formapago, @referencia);SELECT last_insert_rowid();";
         private const string sqlActualizarStock = "UPDATE productos_inventario set stock = stock-@cantidad where idProducto = @idProd";
-        private const string sqlListarVentasPorFecha = "SELECT id, fecha, montoTotal, montoPago, vuelto, formaPago, referencia FROM ventas WHERE date(fecha) BETWEEN date(@fechaDesde) AND date(@fechaHasta) ORDER BY fecha DESC";
+        private const string sqlListarVentasPorFecha = "SELECT id, fecha, montoTotal, montoPago, vuelto, formaPago, referencia FROM ventas WHERE fecha >= @fechaDesde AND fecha < date(@fechaHasta, '+1 day') ORDER BY fecha DESC";
         private const string sqlListarVentas = "SELECT id, fecha, montoTotal, montoPago, vuelto, formaPago, referencia FROM ventas ORDER BY fecha DESC";
 
         /******/
