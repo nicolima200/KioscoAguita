@@ -1,16 +1,16 @@
 ﻿using dominio;
 using dominio.enums;
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace service
 {
     public class ProductoService
     {
 
-        public List<Producto> listar(bool activo =true)
+        public BindingList<Producto> listar(bool activo =true)
         {
-            List<Producto> listaProductos = new List<Producto>();
+            BindingList<Producto> listaProductos = new BindingList<Producto>();
             AccesoDatos datos = new AccesoDatos();
 
             try
@@ -97,22 +97,22 @@ namespace service
             finally { datos.cerrarConexion(); }
         }
 
-        public void eliminarDefinitivo(int id)
-        {
-            AccesoDatos datos = new AccesoDatos();
-            try
-            {
-                datos.setConsulta(consulta.SqlEliminarDefinitivo);
-                datos.setParametro("@id", id);
+        //public void eliminarDefinitivo(int id)
+        //{
+        //    AccesoDatos datos = new AccesoDatos();
+        //    try
+        //    {
+        //        datos.setConsulta(consulta.SqlEliminarDefinitivo);
+        //        datos.setParametro("@id", id);
 
-                datos.ejecutarAccion();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally { datos.cerrarConexion(); }
-        }
+        //        datos.ejecutarAccion();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //    finally { datos.cerrarConexion(); }
+        //}
 
         //Este método sirve para eliminación o recuperación logica. Cambia el atributo 'activo'.
         public void eliminarRecuperar(int id,bool modoRecuperar)
@@ -167,33 +167,37 @@ namespace service
 
         public Producto getProductosLector(AccesoDatos datos)
         {
-            // sqlListarActivos = "SELECT id,codBarras, nombre, descripcion, categoria,
-            // precioMayorista, precioKiosco, stock, stockMinimo, activo, urlImagen,
-            // ventaPorFraccion FROM productos where activo=1"
             Producto producto = new Producto();
-
-            producto.Id = datos.Lector.GetInt32(0);
-            producto.CodBarras = (string)datos.Lector["codBarras"];
-            producto.Nombre = (string)datos.Lector["nombre"];
-            producto.Descripcion = (string)datos.Lector["descripcion"];
-            producto.Categoria = (string)datos.Lector["categoria"];
-            producto.PrecioMayorista = datos.Lector.GetDouble(5);
-            producto.PrecioKiosco = datos.Lector.GetDouble(6);
-            producto.Stock = datos.Lector.GetDouble(7);
-            producto.StockMinimo = datos.Lector.GetInt32(8);
-            producto.Activo = datos.Lector.GetInt32(9);
-            if (!(datos.Lector.IsDBNull(10)))
-                producto.UrlImagen = (string)datos.Lector["urlImagen"];
-
-            if (Enum.TryParse(datos.Lector["tipoVenta"].ToString(), out TipoVenta tipo)){
-                producto.TipoVenta = tipo;
-            }
-            else
+            try
             {
-                producto.TipoVenta = TipoVenta.Unidad; // Valor por defecto si no se puede parsear
-            }
+                producto.Id = datos.Lector.GetInt32(0);
+                producto.CodBarras = (string)datos.Lector["codBarras"];
+                producto.Nombre = (string)datos.Lector["nombre"];
+                producto.Descripcion = (string)datos.Lector["descripcion"];
+                producto.Categoria = (string)datos.Lector["categoria"];
+                producto.PrecioMayorista = datos.Lector.GetDecimal(5);
+                producto.PrecioPublico = datos.Lector.GetDecimal(6);
+                producto.Stock = datos.Lector.GetDouble(7);
+                producto.StockMinimo = datos.Lector.GetInt32(8);
+                producto.Activo = datos.Lector.GetInt32(9);
 
-            return producto;
+                string tipoVenta = (string)datos.Lector["tipoventa"];
+
+                if (Enum.TryParse<TipoVenta>(tipoVenta, out TipoVenta e))
+                    producto.TipoVenta = e;
+
+                if (!(datos.Lector.IsDBNull(10)))
+                    producto.UrlImagen = (string)datos.Lector["urlImagen"];
+
+                producto.Marca = (string)datos.Lector["marca"];
+
+                return producto;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message + producto.Id.ToString());
+            }
+            
         }
 
         private void setearParametros(AccesoDatos datos, Producto producto)
@@ -203,10 +207,12 @@ namespace service
             datos.setParametro("@desc", producto.Descripcion);
             datos.setParametro("@cat", producto.Categoria);
             datos.setParametro("@may", producto.PrecioMayorista);
-            datos.setParametro("@kio", producto.PrecioKiosco);
+            datos.setParametro("@kio", producto.PrecioPublico);
             datos.setParametro("@sto", producto.Stock);
             datos.setParametro("@stockMin", producto.StockMinimo);
-            datos.setParametro("@tipo", producto.TipoVenta);
+            datos.setParametro("@tipo", producto.TipoVenta.ToString());
+            datos.setParametro("@marca", producto.Marca);
+
             // Cuando agregamos o modificamos un producto, por defecto se envía activo=1
             // sea un producto nuevo, activo o que esté en la papelera
             datos.setParametro("@activo", 1);

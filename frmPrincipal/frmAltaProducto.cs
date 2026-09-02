@@ -1,12 +1,14 @@
 ﻿using dominio;
-using System;
-using System.Windows.Forms;
-using service;
-using System.IO;
-using System.Configuration;
-using System.Net;
-using System.Collections.Generic;
 using dominio.enums;
+using service;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Windows.Forms;
 
 namespace frmPrincipal
 {
@@ -22,18 +24,24 @@ namespace frmPrincipal
         {
             InitializeComponent();
             this.producto = producto;
-            Text = "Modificar producto";
+            Text = "Kiosco26 - Modificar producto";
         }
 
         private void frmAltaProducto_Load(object sender, EventArgs e)
         {
             CategoriaService categoriaService = new CategoriaService();
+            MarcaService marcaService = new MarcaService();
             //List<string> tipoDeVenta= new List<string>() { "Unidad", "Kilos", "Litros", "Metros" };
-            
+
             try
             {
                 //Cargamos la lista de categorías
-                cboCategoria.DataSource = categoriaService.listar();
+                cboCategoria.DataSource = categoriaService.listar().OrderBy(x=>x).ToList();
+                cboCategoria.Text = "Varios";
+
+                //Cargamos la lista de marcas
+                cboMarca.DataSource = marcaService.listar();
+                cboMarca.Text = "Sin marca";
 
                 //Cargamos la lista de tipo de venta
                 cboTipoVenta.DataSource = Enum.GetValues(typeof(TipoVenta));
@@ -44,18 +52,19 @@ namespace frmPrincipal
                 {
                     //Si producto no es null precargamos los datos en los textbox
                     cargarTextBox();
-                    txbDescripcion.ForeColor = System.Drawing.Color.Black;
+                    //txbDescripcion.ForeColor = System.Drawing.Color.Black;
                 }
                 else
                 {
                     //Si es null, solo establecemos por defecto la categoria varios
                     //cboCategoria.Text = "Varios";
                     //cboTipoVenta.Text = "Unidad";
-                    txbDescripcion.ForeColor = System.Drawing.Color.DimGray;
+                    //txbDescripcion.ForeColor = System.Drawing.Color.DimGray;
                     //txbDescripcion.Text = "Peso, cant. unidades, sabor, etc...";
 
                 }
                 Helper.cargarImg(pbxAlta, txbUrlImagen.Text);
+                txbCodBarras.Focus();
             }
             catch (Exception ex)
             {
@@ -67,7 +76,6 @@ namespace frmPrincipal
         {
             Close();
         }
-
         private void btnAceptar_Click(object sender, EventArgs e)
         {
 
@@ -94,6 +102,14 @@ namespace frmPrincipal
                         producto = null;
                     return;
                 }
+                if (txbCodBarras.Text.Length > 13)
+                {
+                    if (producto.Id == 0)
+                        producto = null;
+                    MessageBox.Show("El código de barras no puede tener más de 13 dígitos.");
+                    return;
+                }
+
                 producto.CodBarras = txbCodBarras.Text;
 
                 producto.Nombre = txbNombre.Text;
@@ -103,16 +119,18 @@ namespace frmPrincipal
 
                 //Los precios y el stock se validan en los KeyPress
                 //if (Helper.validarTxbNumericos(txbPrecioKiosco))
-                producto.PrecioMayorista = double.Parse(txbPrecioMayorista.Text);
+                producto.PrecioMayorista = decimal.Parse(txbPrecioMayorista.Text);
 
                 //if (Helper.validarTxbNumericos(txbPrecioKiosco))
-                producto.PrecioKiosco = double.Parse(txbPrecioKiosco.Text);
+                producto.PrecioPublico = decimal.Parse(txbPrecioKiosco.Text);
                 
                 producto.Stock = txbStock.Text.Length != 0? double.Parse(txbStock.Text): 0;
 
                 producto.StockMinimo = txbStockMinimo.Text.Length != 0? int.Parse(txbStockMinimo.Text): 0;
-                
-                producto.TipoVenta = cboTipoVenta.SelectedItem != null ? (TipoVenta)cboTipoVenta.SelectedItem : TipoVenta.Unidad;
+
+                producto.TipoVenta = (TipoVenta)cboTipoVenta.SelectedValue;
+
+                producto.Marca = (string)cboMarca.Text;
 
                 //Cada vez que se agrega o modifica, el producto queda activo
                 producto.Activo = 1;
@@ -172,6 +190,30 @@ namespace frmPrincipal
                 MessageBox.Show(ex.ToString());
             }
         }
+        private void btnAgregarImg_Click(object sender, EventArgs e)
+        {
+            archivo = new OpenFileDialog()
+            {
+                Filter = "Archivos de Imagen|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tif;*.tiff;*.webp"
+            };
+
+            if (archivo.ShowDialog() == DialogResult.OK)
+            {
+
+                txbUrlImagen.Text = archivo.FileName;
+                Helper.cargarImg(pbxAlta, archivo.FileName);
+            }
+        }
+        private void btnLimpiarImagen_Click(object sender, EventArgs e)
+        {
+            DialogResult resultado = MessageBox.Show("¿Está seguro que desea eliminar la imagen?","Eliminar imagen",MessageBoxButtons.YesNo);
+            if (resultado == DialogResult.Yes)
+            {
+                txbUrlImagen.Clear();
+                producto.UrlImagen = null;
+                Helper.cargarImg(pbxAlta, "");
+            }
+        }
 
         private void txbCodBarras_Leave(object sender, EventArgs e)
         {
@@ -196,11 +238,13 @@ namespace frmPrincipal
                         if (resultado == DialogResult.Yes)
                         {
                             cargarTextBox();
+                            Text = "Kiosco26 - Modificar producto";
                             txbCodBarras.ReadOnly = true;
                         }
                         else
                         {
                             txbCodBarras.Clear();
+                            txbCodBarras.Focus();
                             MessageBox.Show("El Codigo de barras ya existe. Intente con otro o elimine definitivamente el producto.");
                             producto = null;
                         }
@@ -218,27 +262,18 @@ namespace frmPrincipal
             txbId.Text = producto.Id.ToString();
             txbCodBarras.Text = producto.CodBarras;
             txbNombre.Text = producto.Nombre;
+            cboMarca.Text = producto.Marca;
             txbDescripcion.Text = producto.Descripcion;
             cboCategoria.Text = producto.Categoria;
-            txbPrecioKiosco.Text = producto.PrecioKiosco.ToString();
+            txbPrecioKiosco.Text = producto.PrecioPublico.ToString();
             txbPrecioMayorista.Text = producto.PrecioMayorista.ToString();
             txbStock.Text = producto.Stock.ToString();
             txbStockMinimo.Text = producto.StockMinimo.ToString();
             txbUrlImagen.Text = producto.UrlImagen;
             cboTipoVenta.Text = producto.TipoVenta.ToString();
         }
-        private void btnAgregarImg_Click(object sender, EventArgs e)
-        {
-            archivo = new OpenFileDialog();
-            archivo.Filter = "Archivos de Imagen|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.tif;*.tiff;*.webp";
 
-            if (archivo.ShowDialog() == DialogResult.OK)
-            {
 
-                txbUrlImagen.Text = archivo.FileName;
-                Helper.cargarImg(pbxAlta, archivo.FileName);
-            }
-        }
         private bool guardarImagenLocal()
         {
             if (archivo == null) return true;
@@ -306,43 +341,75 @@ namespace frmPrincipal
         }
         private bool guardarImagenWeb()
         {
+            //URL
             Uri uri = new Uri(txbUrlImagen.Text);
-            string rutaLimpia = uri.AbsolutePath;
-            string destino = ConfigurationManager.AppSettings["images-folder"];
+            string urlLimpia = uri.AbsolutePath;
 
-            if (!Directory.Exists(destino)) Directory.CreateDirectory(destino);
+            //Carpeta de destino
+            string carpetaDestino = ConfigurationManager.AppSettings["images-folder"];
+            string directorioBase = AppDomain.CurrentDomain.BaseDirectory;
+            string rutaCompleta = Path.Combine(directorioBase, carpetaDestino);
 
-            string extension = Path.GetExtension(rutaLimpia);
 
-            string nombreArchivo = txbCodBarras.Text+ txbNombre.Text+DateTime.Now.ToString("dd-MM-yy-HH-mm-ss")+extension;
-            string rutaDestino = Path.Combine(destino, nombreArchivo);
 
-            using(WebClient cliente = new WebClient())
+            if (!Directory.Exists(rutaCompleta)) Directory.CreateDirectory(rutaCompleta);
+
+            //nombre del archivo
+            string extension = Path.GetExtension(urlLimpia);
+            string nombreArchivo = Helper.limpiarCaracteresEspeciales(txbCodBarras.Text) + Helper.limpiarCaracteresEspeciales(txbNombre.Text) + DateTime.Now.ToString("dd-MM-yy-HH-mm-ss") + extension;
+
+
+            string rutaDestino = Path.Combine(rutaCompleta, nombreArchivo);
+
+            try
             {
-                try
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+                HttpClientHandler handler = new HttpClientHandler();
+                handler.AllowAutoRedirect = true;
+                handler.UseCookies = true;
+
+                using (HttpClient cliente = new HttpClient(handler))
                 {
-                    cliente.DownloadFile(uri, rutaDestino);
+                    byte[] imagenBytes = cliente.GetByteArrayAsync(uri).Result;
+
+                    File.WriteAllBytes(rutaDestino, imagenBytes);
                     producto.UrlImagen = rutaDestino;
                     return true;
                 }
-                catch(Exception ex)
-                {
-                    MessageBox.Show("No se pudo descargar la imagen: " + ex.ToString());
-                    return false;
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo descargar la imagen: " + ex.ToString());
+                return false;
             }
 
         }
-        private void btnLimpiarImagen_Click(object sender, EventArgs e)
+        private bool validarTodosTxb()
         {
-            DialogResult resultado = MessageBox.Show("¿Está seguro que desea eliminar la imagen?","Eliminar imagen",MessageBoxButtons.YesNo);
-            if (resultado == DialogResult.Yes)
+            if (!Helper.validarTxbNumericos(txbCodBarras))
+                return false;
+            if (!Helper.validarNomDesc(txbNombre))
+                return false;
+            if (!Helper.validarNomDesc(txbDescripcion))
+                return false;
+            if (!Helper.validarTxbNumericos(txbPrecioMayorista, false))
+                return false;
+            if (!Helper.validarTxbNumericos(txbPrecioKiosco, false))
+                return false;
+            if (!Helper.validarTxbNumericos(txbStock, false))
             {
-                txbUrlImagen.Clear();
-                producto.UrlImagen = null;
-                Helper.cargarImg(pbxAlta, "");
+                txbStock.Text = "0";
+                return false;
             }
+            if (!Helper.validarTxbNumericos(txbStockMinimo))
+            {
+                txbStockMinimo.Text = "0";
+                return false;
+            }
+
+            return true;
         }
+
         private void txbUrlImagen_TextChanged(object sender, EventArgs e)
         {
             Helper.cargarImg(pbxAlta, txbUrlImagen.Text);
@@ -350,6 +417,12 @@ namespace frmPrincipal
         private void txbCodBarras_KeyPress(object sender, KeyPressEventArgs e)
         {
             Helper.soloNumerosKeyPress(e);
+            if (txbCodBarras.Text.Length >= 13 && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+            if (e.KeyChar == '\r')
+                txbNombre.Focus();
         }
         private void txbDescripcion_Enter(object sender, EventArgs e)
         {
@@ -372,22 +445,6 @@ namespace frmPrincipal
         private void txbStockMinimo_KeyPress(object sender, KeyPressEventArgs e)
         {
             Helper.soloNumerosKeyPress(e);
-        }
-        private bool validarTodosTxb()
-        {
-            if(!Helper.validarTxbNumericos(txbCodBarras))
-                return false;
-            if (!Helper.validarNomDesc(txbNombre))
-                return false;
-            if (!Helper.validarNomDesc(txbDescripcion))
-                return false;
-            if (!Helper.validarTxbNumericos(txbPrecioMayorista, false))
-                return false;
-            if (!Helper.validarTxbNumericos(txbPrecioKiosco, false))
-                return false;
-            //if (Helper.validarTxbNumericos(txbStock) == false)
-            //    return false;
-            return true;
         }
 
     }

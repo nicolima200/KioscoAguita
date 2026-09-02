@@ -1,4 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
+using System;
+using System.IO;
 
 namespace service
 {
@@ -8,7 +10,11 @@ namespace service
         private SqliteCommand comando;
         private SqliteDataReader lector;
 
-        private string DbPath= "C:\\Users\\nicol\\Documents\\1.Proyecto KioscoH\\DBKiosco";
+        private string rutaBaseDeDatos = AppDomain.CurrentDomain.BaseDirectory;
+        private string nombreBaseDeDatos = "DBKiosco";
+
+        private string DbPath= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DBKiosco");
+        
         public SqliteDataReader Lector => lector;
 
         public AccesoDatos()
@@ -59,11 +65,33 @@ namespace service
             }
         }
 
+        public int ejecutarAccionGetId()
+        {
+            comando.Connection = conexion;
+            try
+            {
+                conexion.Open();
+                return Convert.ToInt32(comando.ExecuteScalar());
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
+
         public void cerrarConexion()
         {
             if (lector != null)
                 lector.Close();
             conexion.Close();
+        }
+
+        public string getConnectionString()
+        {
+            return DbPath;
         }
     }
 }

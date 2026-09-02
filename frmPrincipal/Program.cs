@@ -1,12 +1,15 @@
-﻿using System;
+﻿using service;
+using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using static service.LicenciaService;
 
 
 namespace frmPrincipal
 {
     internal static class Program
     {
-                [STAThread]
+        [STAThread]
         static void Main()
         {
             try
@@ -14,15 +17,47 @@ namespace frmPrincipal
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                // Asegúrate de que esta línea no esté fallando
-
-                Application.Run(new frmProductos());
+                if (!VerificarLicencia())
+                    return;
+                
+                Application.Run(new frmLogin());
             }
             catch (Exception ex)
             {
-                // Esto te mostrará por qué se cierra si el error es al arrancar
                 MessageBox.Show("Error fatal al iniciar: " + ex.Message + "\n" + ex.StackTrace);
             }
+        }
+
+        private static bool VerificarLicencia()
+        {
+            LicenciaService licenciaService = new LicenciaService();
+
+            EstadoLicencia resultado = licenciaService.RefrescarAsync().GetAwaiter().GetResult();
+
+            if (resultado == EstadoLicencia.Renovada)
+                return true;
+
+            if (resultado == EstadoLicencia.SinConexion)
+            {
+
+                string token = licenciaService.LeerTokenGuardado();
+
+                if (token != null)
+                {
+                    try
+                    {
+                        licenciaService.ValidarToken(token);
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+            }
+
+            using (var frm = new frmActivarLicencia())
+                return frm.ShowDialog() == DialogResult.OK;
         }
     }
 }

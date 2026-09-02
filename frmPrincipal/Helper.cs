@@ -7,9 +7,11 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Management;
 
 namespace frmPrincipal
 {
@@ -45,9 +47,10 @@ namespace frmPrincipal
 
             bool esValido;
 
+            // no usar el 'out' del TryParse, ya que puede generar errores con los ceros a la izquierda
             if (enteros)
             {
-                esValido = int.TryParse(textBox.Text, out _);
+                esValido = long.TryParse(textBox.Text, out _);
             }
             else
             {
@@ -145,6 +148,17 @@ namespace frmPrincipal
             }
             textbox.BackColor = SystemColors.Window;
             return true;
+        }
+
+        public static string limpiarCaracteresEspeciales(string texto)
+        {
+            //Elimina caracteres especiales de un string
+            char[] caracteresEspeciales = { '@', '#', '$', '%', '^', '&', '*', '(', ')', '=', '+', '{', '}', '[', ']', '|', '\\', ':', ';', '"', '\'', '<', '>', ',', '?', '/' };
+            foreach (char c in caracteresEspeciales)
+            {
+                texto = texto.Replace(c.ToString(), "");
+            }
+            return texto;
         }
     }
 }

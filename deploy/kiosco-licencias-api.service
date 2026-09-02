@@ -1,0 +1,21 @@
+[Unit]
+Description=Kiosco26 Licencias API
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/kiosco-licencias
+ExecStart=/opt/kiosco-licencias/LicenciasApi
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+User=kiosco
+Group=kiosco
+Environment=DOTNET_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://localhost:5000
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/kiosco-licencias
+
+[Install]
+WantedBy=multi-user.target

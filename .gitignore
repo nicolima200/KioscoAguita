@@ -426,3 +426,18 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# PEM
+clave-privada.pem
+licencias.db
+bin/
+obj/
+
+# Bases de datos locales (contienen hashes de password y datos de negocio)
+DBKiosco
+
+# Indice del codebase-memory
+.codebase-memory/
+
+# Config local de Claude Code
+.claude/

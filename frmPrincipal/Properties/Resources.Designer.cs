@@ -63,9 +63,39 @@ namespace frmPrincipal.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bgActivacion {
+            get {
+                object obj = ResourceManager.GetObject("bgActivacion", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap imagenNoEncontrada {
             get {
                 object obj = ResourceManager.GetObject("imagenNoEncontrada", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap logoKiosco26 {
+            get {
+                object obj = ResourceManager.GetObject("logoKiosco26", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap logoKiosco26transparente {
+            get {
+                object obj = ResourceManager.GetObject("logoKiosco26transparente", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

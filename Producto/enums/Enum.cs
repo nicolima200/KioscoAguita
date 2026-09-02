@@ -13,4 +13,18 @@ namespace dominio.enums
         Litro,
         Metro
     }
+
+    public enum FormaPago
+    {
+        Efectivo,
+        TarjetaCredito,
+        TarjetaDebito,
+        Transferencia
+    }
+
+    public enum TipoUsuario
+    {
+        Admin = 1,
+        Empleado = 2,
+    }
 }
