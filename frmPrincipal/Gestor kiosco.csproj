@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProjectGuid>{76D70D42-0C9D-4C52-B0AF-0ADF1050063C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>frmPrincipal</RootNamespace>
@@ -110,7 +110,7 @@
     <PackageReference Include="Magick.NET.SystemDrawing" Version="8.0.14" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.10" />
     <PackageReference Include="Obfuscar" Version="2.2.50" PrivateAssets="all" />
-    <PackageReference Include="SourceGear.sqlite3" Version="3.50.4.2" />
+    <PackageReference Include="SourceGear.sqlite3" Version="3.53.3" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.4" />
     <PackageReference Include="SQLitePCLRaw.core" Version="3.0.4" />
     <PackageReference Include="System.Buffers" Version="4.6.1" />
