@@ -40,6 +40,7 @@ namespace service
                     }
                     catch (Exception)
                     {
+                        try { transaccion.Rollback(); } catch { }
                         throw;
                     }
                 }
