@@ -210,7 +210,7 @@ namespace frmPrincipal
             if (resultado == DialogResult.Yes)
             {
                 txbUrlImagen.Clear();
-                producto.UrlImagen = null;
+                if (producto != null) producto.UrlImagen = null;
                 Helper.cargarImg(pbxAlta, "");
             }
         }
@@ -372,7 +372,7 @@ namespace frmPrincipal
 
                 using (HttpClient cliente = new HttpClient(handler))
                 {
-                    byte[] imagenBytes = cliente.GetByteArrayAsync(uri).Result;
+                    byte[] imagenBytes = cliente.GetByteArrayAsync(uri).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     File.WriteAllBytes(rutaDestino, imagenBytes);
                     producto.UrlImagen = rutaDestino;
