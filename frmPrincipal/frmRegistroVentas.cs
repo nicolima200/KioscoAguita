@@ -148,21 +148,92 @@ namespace frmPrincipal
 
         private void configColumnasDgvVentas()
         {
-            //Damos formato a las columnas
-            dgvVentas.Columns["Id"].Visible = false;
-            dgvVentas.AutoResizeColumn(1);//fecha
+            if (dgvVentas.Columns.Count == 0) return;
+            dgvVentas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvVentas.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgvVentas.ColumnHeadersHeight = 32;
+            dgvVentas.RowTemplate.Height = 26;
+            dgvVentas.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            dgvVentas.ColumnHeadersDefaultCellStyle.Padding = new Padding(0);
+            dgvVentas.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
 
-            dgvVentas.Columns["montototal"].DefaultCellStyle.Format = "C2";
-            dgvVentas.Columns["montototal"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dgvVentas.AutoResizeColumn(3);//monto total
+            // Id oculto
+            if (dgvVentas.Columns["Id"] != null) dgvVentas.Columns["Id"].Visible = false;
 
-            dgvVentas.Columns["montopago"].DefaultCellStyle.Format = "C2";
-            dgvVentas.Columns["montopago"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dgvVentas.AutoResizeColumn(4);//monto pago
-
-            dgvVentas.Columns["vuelto"].DefaultCellStyle.Format = "C2";
-            dgvVentas.Columns["vuelto"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dgvVentas.AutoResizeColumn(5);//vuelto
+            // Fecha - izquierda, ancho para "2/9/2026 13:03"
+            var colFecha = dgvVentas.Columns["Fecha"];
+            if (colFecha != null)
+            {
+                colFecha.HeaderText = "Fecha";
+                colFecha.FillWeight = 16;
+                colFecha.MinimumWidth = 95;
+                colFecha.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                colFecha.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                colFecha.DefaultCellStyle.Format = "g";
+            }
+            // Forma de pago
+            var colPago = dgvVentas.Columns["FormaPago"];
+            if (colPago != null)
+            {
+                colPago.HeaderText = "Forma de pago";
+                colPago.FillWeight = 18;
+                colPago.MinimumWidth = 100;
+                colPago.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                colPago.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            }
+            // TOTAL
+            var colTotal = dgvVentas.Columns["MontoTotal"] ?? dgvVentas.Columns["montototal"];
+            if (colTotal != null)
+            {
+                colTotal.HeaderText = "Total";
+                colTotal.FillWeight = 16;
+                colTotal.MinimumWidth = 95;
+                colTotal.DefaultCellStyle.Format = "C2";
+                colTotal.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                colTotal.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight;
+            }
+            // Cliente pagó con / Pagó con
+            var colMontoPago = dgvVentas.Columns["MontoPago"] ?? dgvVentas.Columns["montopago"];
+            if (colMontoPago != null)
+            {
+                colMontoPago.HeaderText = "Pagó con";
+                colMontoPago.FillWeight = 18;
+                colMontoPago.MinimumWidth = 105;
+                colMontoPago.DefaultCellStyle.Format = "C2";
+                colMontoPago.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                colMontoPago.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight;
+            }
+            // Vuelto
+            var colVuelto = dgvVentas.Columns["Vuelto"] ?? dgvVentas.Columns["vuelto"];
+            if (colVuelto != null)
+            {
+                colVuelto.HeaderText = "Vuelto";
+                colVuelto.FillWeight = 16;
+                colVuelto.MinimumWidth = 95;
+                colVuelto.DefaultCellStyle.Format = "C2";
+                colVuelto.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                colVuelto.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight;
+            }
+            // Referencia
+            var colRef = dgvVentas.Columns["referencia"];
+            if (colRef != null)
+            {
+                colRef.HeaderText = "Referencia";
+                colRef.FillWeight = 24;
+                colRef.MinimumWidth = 110;
+                colRef.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+                colRef.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            }
+            // Asegurar estilos modernos sin grilla vertical pesada
+            dgvVentas.EnableHeadersVisualStyles = false;
+            dgvVentas.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(233, 237, 243);
+            dgvVentas.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(71, 85, 105);
+            dgvVentas.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            dgvVentas.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dgvVentas.DefaultCellStyle.Font = new Font("Segoe UI", 9F);
+            dgvVentas.GridColor = Color.FromArgb(212, 219, 232);
+            dgvVentas.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgvVentas.BackgroundColor = Color.White;
         }
 
         //private void limpiarLabelsDetalle()
@@ -252,6 +323,8 @@ namespace frmPrincipal
 
             List<Venta> listaFiltrada = registroVentasService.listarPorFecha(desde, hasta).ToList();
             dgvVentas.DataSource = listaFiltrada;
+            configColumnasDgvVentas();
+            configFilasDgvVentas();
             dgvVentas_CurrentCellChanged(sender, e);
 
             calcularYMostrarTotales(listaFiltrada);

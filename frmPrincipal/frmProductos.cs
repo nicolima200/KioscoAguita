@@ -84,36 +84,43 @@ namespace frmPrincipal
         {
             Text = "Kiosco26 - Recuperar producto | " + DateTime.Now.ToShortDateString();
             AutoSize = false;
-            Size = new Size(685, 650);
-
-            btnLimpiarVenta.Visible = false;
-            btnEliminarItemVenta.Visible = false;
-
-            btnRecuperar.Visible = true;
-            btnRecuperar.Location = new Point(240, 530);
-            //btnEliminarDefinitivo.Visible = true;
-            //btnEliminarDefinitivo.Location = new Point(389, 648);
-
-            tsmGestionar.Visible = false;
-
-            lblTitulo.Text = "Recuperar productos ";
-            tbxFiltro.Location = new Point(160, 45);
-
-            lblVenta.Visible = false;
-            dgvVenta.Visible = false;
-            lblCantProductosLista.Visible = false;
-            lblTotal.Visible = false;
-            lblFondoTotal.Visible = false;
-            btnCobrar.Visible = false;
+            Size = new Size(760, 620);
+            MinimumSize = new Size(760, 620);
+            BackColor = Color.FromArgb(233, 237, 243);
+            // encabezado correcto
+            lblAppTitulo.Text = "KIOSCO26  •  RECUPERAR PRODUCTO";
+            // ocultar atajos exclusivos de VENTA
+            lblAtajos.Visible = false;
+            lblAtajoEsc.Visible = false;
+            // ocultar venta
+            pnlRightCard.Visible = false;
+            pnlFooter.Visible = false;
+            pnlRightFooter.Visible = false;
             lblCantidad.Visible = false;
             tbxCantidad.Visible = false;
-            lblAtajos.Visible = false;
-            gbxNombre.Visible = false;
+            btnLimpiarVenta.Visible = false;
+            btnEliminarItemVenta.Visible = false;
+            btnRecuperar.Visible = true;
+            tsmGestionar.Visible = false;
             tsmRegistroVentas.Visible = false;
-            dgvPrincipal.Size = new Size(650, 350);
-            BackColor = System.Drawing.Color.Aquamarine;
-            pbxProducto.Size = new Size(100, 100);
-            pbxProducto.Location = new Point(280, 425);
+            lblTitulo.Text = "⌕  Recuperar productos";
+            lblTitulo.AutoSize = true;
+            // reposicionar búsqueda sin solape: label + textbox + X con separación clara y Anchor responsive
+            lblTitulo.Location = new Point(16, 18);
+            int tbxLeft = lblTitulo.Right + 12;
+            // asegurar mínimo 180px de separación incluso si label crece
+            if (tbxLeft < 190) tbxLeft = 190;
+            tbxFiltro.Location = new Point(tbxLeft, 13);
+            tbxFiltro.Size = new Size(300, 25);
+            tbxFiltro.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            btnLimpiarFiltro.Location = new Point(tbxFiltro.Right + 6, 13);
+            btnLimpiarFiltro.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            lblVenta.Visible = false;
+            lblCantProductosLista.Visible = false;
+            // expandir lista principal a todo el ancho
+            pnlMain.ColumnStyles[0].Width = 100;
+            pnlMain.ColumnStyles[1].Width = 0;
+            pnlDetailCard.Visible = true;
             this.CenterToScreen();
         }
 
@@ -163,30 +170,28 @@ namespace frmPrincipal
         {
             foreach (DataGridViewRow fila in dgvPrincipal.Rows)
             {
-                //    int posicion = listaProd.IndexOf(p);
-                //if (dgvPrincipal.Rows.Count == 0 || dgvPrincipal.RowCount <= posicion) return;
-
-                if (fila != null)
+                if (fila == null) continue;
+                try
                 {
-                    double stockFila = (double)fila.Cells["stock"].Value;
-                    double stockMinimoFila = (double)fila.Cells["stockminimo"].Value;
-
+                    double stockFila = Convert.ToDouble(fila.Cells["stock"].Value);
+                    double stockMinimoFila = Convert.ToDouble(fila.Cells["stockminimo"].Value);
                     if (stockFila == 0)
                     {
-                        fila.DefaultCellStyle.BackColor = Color.OrangeRed;
-
-                        continue;
+                        fila.DefaultCellStyle.BackColor = Color.FromArgb(254, 226, 226);
+                        fila.DefaultCellStyle.ForeColor = Color.FromArgb(153, 27, 27);
                     }
                     else if (stockFila <= stockMinimoFila)
                     {
-                        fila.DefaultCellStyle.BackColor = ColorTranslator.FromHtml("#FFA3C2");
-                        continue;
+                        fila.DefaultCellStyle.BackColor = Color.FromArgb(255, 247, 237);
+                        fila.DefaultCellStyle.ForeColor = Color.FromArgb(154, 52, 18);
                     }
                     else
                     {
                         fila.DefaultCellStyle.BackColor = Color.White;
+                        fila.DefaultCellStyle.ForeColor = Color.FromArgb(23, 32, 51);
                     }
                 }
+                catch { }
             }
         }
 
@@ -226,10 +231,10 @@ namespace frmPrincipal
             if (seleccionado != null)
             {
                 lblNombre.Text = seleccionado.Nombre;
-                lblMarca.Text = seleccionado.Marca;
+                lblMarca.Text = "Marca: " + seleccionado.Marca;
                 lblDescripcion.Text = seleccionado.Descripcion;
-                lblPrecio.Text = "$ " + seleccionado.PrecioPublico.ToString();
-                lblTagPrecio.Text = "Precio x " + seleccionado.TipoVenta.ToString();
+                lblPrecio.Text = "$ " + seleccionado.PrecioPublico.ToString("N2");
+                lblTagPrecio.Text = "Precio x " + seleccionado.TipoVenta.ToString() + ":";
             }
             else
             {
@@ -238,11 +243,11 @@ namespace frmPrincipal
         }
         private void limpiarLabelsDetalle()
         {
-            lblNombre.Text = "";
-            lblMarca.Text = "";
-            lblDescripcion.Text = "";
-            lblPrecio.Text = "";
-            lblTagPrecio.Text = "";
+            lblNombre.Text = "—";
+            lblMarca.Text = "—";
+            lblDescripcion.Text = "—";
+            lblPrecio.Text = "$ —";
+            lblTagPrecio.Text = "Precio x Unidad:";
         }
         private void btnLimpiarFiltro_Click(object sender, EventArgs e)
         {
@@ -541,8 +546,10 @@ namespace frmPrincipal
         private void actualizarLblTotalYCantidad()
         {
             sumaTotalYCantidadProd();
-            lblCantProductosLista.Text = "Cantidad de productos: " + cantidadProductos.ToString();
-            lblTotal.Text = "$ " + totalVenta.ToString();
+            lblCantProductosLista.Text = cantidadProductos.ToString("0.##") + " productos";
+            lblTotal.Text = "$ " + totalVenta.ToString("N2");
+            btnCobrar.Enabled = totalVenta > 0;
+            btnCobrar.BackColor = totalVenta > 0 ? Color.FromArgb(22, 163, 74) : Color.FromArgb(156, 163, 175);
         }
         private void sumaTotalYCantidadProd()
         {
@@ -744,32 +751,27 @@ namespace frmPrincipal
             seleccionado = productoSeleccionado();
             cargarImagen();
             cargarDetalle();
-
-            if (seleccionado != null)
-                if (seleccionado.Stock > 0)
-                {
-                    dgvPrincipal.DefaultCellStyle.SelectionForeColor = Color.Black;
-                    //tbxCantidad.Text = "1";
-
-                }
-                else
-                    dgvPrincipal.DefaultCellStyle.SelectionForeColor = Color.OrangeRed;
+            if (seleccionado != null && seleccionado.Stock <= 0)
+                dgvPrincipal.DefaultCellStyle.SelectionForeColor = Color.FromArgb(220, 38, 38);
+            else
+                dgvPrincipal.DefaultCellStyle.SelectionForeColor = Color.FromArgb(30, 64, 175);
         }
 
         private void configurarDgvVenta()
         {
-
             dgvVenta.DataSource = listaVenta;
-
-
-            dgvVenta.Columns["id"].Visible = false;
-            dgvVenta.Columns["idVenta"].Visible = false;
-            dgvVenta.Columns["idProducto"].Visible = false;
-            dgvVenta.Columns["CodBarras"].Visible = false;
-            dgvVenta.Columns["marca"].Visible = false;
-            dgvVenta.Columns["CodBarras"].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            dgvVenta.Columns["Descripcion"].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            dgvVenta.Columns["Subtotal"].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            if (dgvVenta.Columns["id"] != null) dgvVenta.Columns["id"].Visible = false;
+            if (dgvVenta.Columns["idVenta"] != null) dgvVenta.Columns["idVenta"].Visible = false;
+            if (dgvVenta.Columns["idProducto"] != null) dgvVenta.Columns["idProducto"].Visible = false;
+            if (dgvVenta.Columns["CodBarras"] != null) dgvVenta.Columns["CodBarras"].Visible = false;
+            if (dgvVenta.Columns["marca"] != null) dgvVenta.Columns["marca"].Visible = false;
+            if (dgvVenta.Columns["TipoVenta"] != null) dgvVenta.Columns["TipoVenta"].Visible = false;
+            // formato moderno
+            if (dgvVenta.Columns["Nombre"] != null) { dgvVenta.Columns["Nombre"].HeaderText = "Producto"; dgvVenta.Columns["Nombre"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; }
+            if (dgvVenta.Columns["Descripcion"] != null) { dgvVenta.Columns["Descripcion"].HeaderText = "Detalle"; dgvVenta.Columns["Descripcion"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill; dgvVenta.Columns["Descripcion"].FillWeight = 80; }
+            if (dgvVenta.Columns["Cantidad"] != null) { dgvVenta.Columns["Cantidad"].HeaderText = "Cant."; dgvVenta.Columns["Cantidad"].Width = 60; dgvVenta.Columns["Cantidad"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter; }
+            if (dgvVenta.Columns["PrecioUnitario"] != null) { dgvVenta.Columns["PrecioUnitario"].HeaderText = "P. Unit."; dgvVenta.Columns["PrecioUnitario"].Width = 90; dgvVenta.Columns["PrecioUnitario"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight; dgvVenta.Columns["PrecioUnitario"].DefaultCellStyle.Format = "N2"; }
+            if (dgvVenta.Columns["Subtotal"] != null) { dgvVenta.Columns["Subtotal"].HeaderText = "Subtotal"; dgvVenta.Columns["Subtotal"].Width = 100; dgvVenta.Columns["Subtotal"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight; dgvVenta.Columns["Subtotal"].DefaultCellStyle.Format = "N2"; dgvVenta.Columns["Subtotal"].DefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold); }
         }
 
         private void tbxCantidad_Enter(object sender, EventArgs e)
@@ -803,19 +805,8 @@ namespace frmPrincipal
 
         private void redimensionarItemsAlMaximizar()
         {
-            if (WindowState == FormWindowState.Maximized)
-            {
-                double factorAncho = Size.Width / tamanioInicialForm.Width * 1.25;
-                double factorAlto = (Size.Height / tamanioInicialForm.Height) * 1.5;
-
-                dgvPrincipal.Size = new Size((int)(tamanioInicialDgvPrincipal.Width * factorAncho), (int)(tamanioInicialDgvPrincipal.Height * factorAlto));
-                dgvVenta.Size = new Size((int)(tamanioInicialDgvVentas.Width * factorAncho * 0.8), (int)(tamanioInicialDgvVentas.Height * factorAlto * 0.8));
-            }
-            else
-            {
-                dgvPrincipal.Size = tamanioInicialDgvPrincipal;
-                dgvVenta.Size = tamanioInicialDgvVentas;
-            }
+            // Layout manejado por Dock/TableLayoutPanel — no escalar manual
+            return;
         }
 
         private void dgvPrincipal_RowLeave(object sender, DataGridViewCellEventArgs e)

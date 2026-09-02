@@ -33,26 +33,33 @@ namespace frmPrincipal
 
         private void aplicarTema()
         {
-            //Color fondo
-            //azul oscuro
-            this.BackColor = ColorTranslator.FromHtml("#1E1E2F");
-
-            //Labels
-            lblTotal.ForeColor = ColorTranslator.FromHtml("#00D25B");
-            lblMontoTotal.Text = montoTotal.ToString("N2");
-
-            lblClientePagaEfectivo.BackColor = ColorTranslator.FromHtml("#27293D");
-            lblVuelto.BackColor = ColorTranslator.FromHtml("#27293D");
-            lblNombreCliente.BackColor = ColorTranslator.FromHtml("#27293D");
-
-
+            BackColor = Color.FromArgb(233, 237, 243);
+            lblMontoTotal.Text = "$ " + montoTotal.ToString("N2");
             lblMontoVuelto.Text = "$ 0,00";
-
-            //TextBox
-            
-
-            btnVolver.BackColor = ColorTranslator.FromHtml("#27293D");
-
+            // estilizar toggle según selección
+            ActualizarEstiloToggle();
+            btnPagoEfectivo.CheckedChanged += (s, e) => ActualizarEstiloToggle();
+            btnPagoTransferencia.CheckedChanged += (s, e) => ActualizarEstiloToggle();
+        }
+        private void ActualizarEstiloToggle()
+        {
+            var azul = Color.FromArgb(37, 99, 235);
+            var gris = Color.FromArgb(23, 32, 51);
+            var blanco = Color.White;
+            if (btnPagoEfectivo.Checked)
+            {
+                btnPagoEfectivo.BackColor = azul; btnPagoEfectivo.ForeColor = blanco;
+                btnPagoEfectivo.FlatAppearance.BorderColor = azul;
+                btnPagoTransferencia.BackColor = blanco; btnPagoTransferencia.ForeColor = gris;
+                btnPagoTransferencia.FlatAppearance.BorderColor = Color.FromArgb(212, 219, 232);
+            }
+            else
+            {
+                btnPagoTransferencia.BackColor = azul; btnPagoTransferencia.ForeColor = blanco;
+                btnPagoTransferencia.FlatAppearance.BorderColor = azul;
+                btnPagoEfectivo.BackColor = blanco; btnPagoEfectivo.ForeColor = gris;
+                btnPagoEfectivo.FlatAppearance.BorderColor = Color.FromArgb(212, 219, 232);
+            }
         }
 
         private void tbxMontoEfectivo_KeyDown(object sender, KeyEventArgs e)
@@ -196,11 +203,13 @@ namespace frmPrincipal
                     if (montoEfectivo > montoTotal)
                     {
                         vuelto = montoEfectivo - montoTotal;
-                        lblMontoVuelto.Text = "$ " + vuelto.ToString();
+                        lblMontoVuelto.Text = "$ " + vuelto.ToString("N2");
+                        lblMontoVuelto.ForeColor = Color.FromArgb(22, 163, 74);
                     }
                     else{
                         vuelto = 0;
                         lblMontoVuelto.Text = "$ 0,00";
+                        lblMontoVuelto.ForeColor = Color.FromArgb(102, 112, 133);
                     }
                 }
         }
