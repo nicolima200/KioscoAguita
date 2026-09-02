@@ -73,7 +73,7 @@ namespace frmPrincipal
 
         private void btnPagoTransferencia_CheckedChanged(object sender, EventArgs e)
         {
-            pnlPagoTransferencia.Visible = btnPagoTransferencia.Checked;
+            // Referencia siempre visible (pnlReferencia) — solo alterna panel efectivo
             pnlPagoEfectivo.Visible = btnPagoEfectivo.Checked;
 
             //Pago con transferencia
@@ -163,7 +163,10 @@ namespace frmPrincipal
             nuevaVenta.MontoPago = montoEfectivo;
             nuevaVenta.Vuelto = montoEfectivo - montoTotal;
             nuevaVenta.FormaPago = FormaPago.Efectivo;
-            nuevaVenta.referencia = "-";
+            if (string.IsNullOrWhiteSpace(tbxNombreCliente.Text))
+                nuevaVenta.referencia = "Sin referencia";
+            else
+                nuevaVenta.referencia = tbxNombreCliente.Text.Trim();
 
             ventaService.guardarVentaCompleta(nuevaVenta, listaVenta);
         }

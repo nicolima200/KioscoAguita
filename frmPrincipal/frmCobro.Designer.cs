@@ -45,13 +45,14 @@
             this.pnlTotal = new System.Windows.Forms.Panel();
             this.pnlPagoEfectivo = new System.Windows.Forms.Panel();
             this.pnlPagoTransferencia = new System.Windows.Forms.Panel();
+            this.pnlReferencia = new System.Windows.Forms.Panel();
             this.tbxNombreCliente = new System.Windows.Forms.TextBox();
             this.lblNombreCliente = new System.Windows.Forms.Label();
             this.lblAvisoEfectivo = new System.Windows.Forms.Label();
             this.pnlFormaPago.SuspendLayout();
             this.pnlTotal.SuspendLayout();
             this.pnlPagoEfectivo.SuspendLayout();
-            this.pnlPagoTransferencia.SuspendLayout();
+            this.pnlReferencia.SuspendLayout();
             this.SuspendLayout();
             // 
             // lblTotal
@@ -151,7 +152,7 @@
             this.btnCobrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCobrar.Font = new System.Drawing.Font("Cambria", 26F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(254)));
             this.btnCobrar.ForeColor = System.Drawing.SystemColors.Window;
-            this.btnCobrar.Location = new System.Drawing.Point(239, 446);
+            this.btnCobrar.Location = new System.Drawing.Point(239, 540);
             this.btnCobrar.Name = "btnCobrar";
             this.btnCobrar.Size = new System.Drawing.Size(165, 53);
             this.btnCobrar.TabIndex = 8;
@@ -166,7 +167,7 @@
             this.btnVolver.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnVolver.Font = new System.Drawing.Font("Cambria", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(254)));
             this.btnVolver.ForeColor = System.Drawing.SystemColors.Window;
-            this.btnVolver.Location = new System.Drawing.Point(544, 530);
+            this.btnVolver.Location = new System.Drawing.Point(544, 600);
             this.btnVolver.Name = "btnVolver";
             this.btnVolver.Size = new System.Drawing.Size(88, 38);
             this.btnVolver.TabIndex = 9;
@@ -251,36 +252,42 @@
             // 
             // pnlPagoTransferencia
             // 
-            this.pnlPagoTransferencia.AutoSize = true;
-            this.pnlPagoTransferencia.Controls.Add(this.tbxNombreCliente);
-            this.pnlPagoTransferencia.Controls.Add(this.lblNombreCliente);
             this.pnlPagoTransferencia.Location = new System.Drawing.Point(14, 305);
             this.pnlPagoTransferencia.Name = "pnlPagoTransferencia";
-            this.pnlPagoTransferencia.Size = new System.Drawing.Size(614, 117);
+            this.pnlPagoTransferencia.Size = new System.Drawing.Size(614, 0);
             this.pnlPagoTransferencia.TabIndex = 15;
             this.pnlPagoTransferencia.Visible = false;
             // 
+            // pnlReferencia
+            // 
+            this.pnlReferencia.Controls.Add(this.tbxNombreCliente);
+            this.pnlReferencia.Controls.Add(this.lblNombreCliente);
+            this.pnlReferencia.Location = new System.Drawing.Point(42, 435);
+            this.pnlReferencia.Name = "pnlReferencia";
+            this.pnlReferencia.Size = new System.Drawing.Size(535, 55);
+            this.pnlReferencia.TabIndex = 16;
+            // 
             // tbxNombreCliente
             // 
-            this.tbxNombreCliente.Font = new System.Drawing.Font("Cambria", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbxNombreCliente.Location = new System.Drawing.Point(147, 54);
+            this.tbxNombreCliente.Font = new System.Drawing.Font("Cambria", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbxNombreCliente.Location = new System.Drawing.Point(279, 3);
             this.tbxNombreCliente.MaxLength = 30;
             this.tbxNombreCliente.Name = "tbxNombreCliente";
-            this.tbxNombreCliente.Size = new System.Drawing.Size(321, 42);
+            this.tbxNombreCliente.Size = new System.Drawing.Size(227, 39);
             this.tbxNombreCliente.TabIndex = 7;
-            this.tbxNombreCliente.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbxNombreCliente.TextAlign = System.Windows.Forms.HorizontalAlignment.Left;
             // 
             // lblNombreCliente
             // 
             this.lblNombreCliente.AutoSize = true;
             this.lblNombreCliente.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lblNombreCliente.Font = new System.Drawing.Font("Cambria", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNombreCliente.Font = new System.Drawing.Font("Cambria", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblNombreCliente.ForeColor = System.Drawing.SystemColors.Window;
-            this.lblNombreCliente.Location = new System.Drawing.Point(180, 6);
+            this.lblNombreCliente.Location = new System.Drawing.Point(9, 8);
             this.lblNombreCliente.Name = "lblNombreCliente";
-            this.lblNombreCliente.Size = new System.Drawing.Size(254, 39);
+            this.lblNombreCliente.Size = new System.Drawing.Size(156, 34);
             this.lblNombreCliente.TabIndex = 7;
-            this.lblNombreCliente.Text = "Nombre cliente:";
+            this.lblNombreCliente.Text = "Referencia:";
             // 
             // lblAvisoEfectivo
             // 
@@ -302,7 +309,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Navy;
             this.CancelButton = this.btnVolver;
-            this.ClientSize = new System.Drawing.Size(642, 580);
+            this.ClientSize = new System.Drawing.Size(642, 650);
             this.Controls.Add(this.lblAvisoEfectivo);
             this.Controls.Add(this.pnlFormaPago);
             this.Controls.Add(this.btnVolver);
@@ -311,6 +318,7 @@
             this.Controls.Add(this.pnlTotal);
             this.Controls.Add(this.pnlPagoEfectivo);
             this.Controls.Add(this.pnlPagoTransferencia);
+            this.Controls.Add(this.pnlReferencia);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
@@ -324,8 +332,8 @@
             this.pnlTotal.PerformLayout();
             this.pnlPagoEfectivo.ResumeLayout(false);
             this.pnlPagoEfectivo.PerformLayout();
-            this.pnlPagoTransferencia.ResumeLayout(false);
-            this.pnlPagoTransferencia.PerformLayout();
+            this.pnlReferencia.ResumeLayout(false);
+            this.pnlReferencia.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -348,6 +356,7 @@
         private System.Windows.Forms.Panel pnlTotal;
         private System.Windows.Forms.Panel pnlPagoEfectivo;
         private System.Windows.Forms.Panel pnlPagoTransferencia;
+        private System.Windows.Forms.Panel pnlReferencia;
         private System.Windows.Forms.TextBox tbxNombreCliente;
         private System.Windows.Forms.Label lblNombreCliente;
         private System.Windows.Forms.Label lblAvisoEfectivo;
