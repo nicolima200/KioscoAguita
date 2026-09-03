@@ -27,8 +27,23 @@ namespace frmPrincipal
             Text = "Kiosco26 - Modificar producto";
         }
 
+        private void actualizarEncabezado()
+        {
+            if (producto != null)
+            {
+                lblHeaderTitle.Text = "KIOSCO26  -  MODIFICAR PRODUCTO";
+                Text = "Kiosco26 - Modificar producto";
+            }
+            else
+            {
+                lblHeaderTitle.Text = "KIOSCO26  -  AGREGAR PRODUCTO";
+                Text = "Kiosco26 - Agregar producto";
+            }
+        }
+
         private void frmAltaProducto_Load(object sender, EventArgs e)
         {
+            actualizarEncabezado();
             CategoriaService categoriaService = new CategoriaService();
             MarcaService marcaService = new MarcaService();
             //List<string> tipoDeVenta= new List<string>() { "Unidad", "Kilos", "Litros", "Metros" };
@@ -70,6 +85,16 @@ namespace frmPrincipal
             {
 
                 MessageBox.Show(ex.ToString());
+            }
+        }
+        private void frmAltaProducto_Shown(object sender, EventArgs e)
+        {
+            //Foco directo en codigo de barras para permitir escaneo inmediato (flujo alta)
+            if (producto == null)
+            {
+                ActiveControl = txbCodBarras;
+                txbCodBarras.Focus();
+                txbCodBarras.SelectAll();
             }
         }
         private void btnCancelar_Click(object sender, EventArgs e)
@@ -240,7 +265,7 @@ namespace frmPrincipal
                         if (resultado == DialogResult.Yes)
                         {
                             cargarTextBox();
-                            Text = "Kiosco26 - Modificar producto";
+                            actualizarEncabezado();
                             txbCodBarras.ReadOnly = true;
                         }
                         else
@@ -282,21 +307,23 @@ namespace frmPrincipal
 
             string carpeta = ConfigurationManager.AppSettings["images-folder"] ?? "imágenes";
             string nombreArchivo = archivo.SafeFileName;
-            string carpetaArchivo = Path.GetDirectoryName(archivo.FileName)+"\\";
+            string carpetaArchivo = Path.GetDirectoryName(archivo.FileName) + "\\";
             string rutaAchivoNuevo = Path.Combine(carpeta, nombreArchivo);
-            
+
+            string rutaNuevaCompleta = Path.GetFullPath(rutaAchivoNuevo);
+            string rutaOrigenCompleta = Path.GetFullPath(archivo.FileName);
+
+            //Si el archivo seleccionado ya se encuentra dentro de la carpeta de recursos,
+            //no lo copia, solamente cambia la url
+            if (rutaOrigenCompleta.Equals(rutaNuevaCompleta, StringComparison.OrdinalIgnoreCase))
+            {
+                producto.UrlImagen = rutaAchivoNuevo;
+                return true;
+            }
 
             if (File.Exists(rutaAchivoNuevo))// Comprobamos si hay un archivo con ese nombre en esa ruta
             {
                 if (rutaAchivoNuevo.Equals(producto.UrlImagen)) return true;
-
-                //Si el archivo seleccionado ya se encuentra dentro de la carpeta de recursos, no lo copia,
-                //solamente cambia la url
-                if (carpetaArchivo.Equals(carpeta))
-                {
-                    producto.UrlImagen = rutaAchivoNuevo;
-                    return true;
-                }
 
                 DialogResult respuesta = MessageBox.Show("Ya existe una imagen con ese nombre. ¿Desea sobrescribirla?", "Imagen existente", MessageBoxButtons.YesNo);
 

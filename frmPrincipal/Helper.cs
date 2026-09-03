@@ -1,12 +1,12 @@
 ﻿using dominio;
 using frmPrincipal;
-using ImageMagick;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +17,8 @@ namespace frmPrincipal
 {
     public static class Helper
     {
+        private static readonly HttpClient httpClient = new HttpClient();
+
         public static void soloNumerosKeyPress(KeyPressEventArgs e)
         {
             if ((!char.IsDigit(e.KeyChar)) && (!char.IsControl(e.KeyChar)))
@@ -74,67 +76,110 @@ namespace frmPrincipal
         {
             try
             {
-                if (ruta != null)
+                if (string.IsNullOrWhiteSpace(ruta))
                 {
-                    //Si contiene http es una imagen en línea
-                    if (ruta.ToLower().Contains("http"))
-                    {
-                        using (WebClient cliente = new WebClient())
-                        {
-                            byte[] data = cliente.DownloadData(ruta);
+                    AsignarImagen(pbx, Properties.Resources.imagenNoEncontrada);
+                    return;
+                }
 
-                            using (MemoryStream ms = new MemoryStream(data))
-                            {
-                                //Si la extensión es webp, usa la librería MagickImage para convertirla y poder renderizarla
-                                if (ruta.ToLower().EndsWith(".webp"))
-                                {
-                                    ms.Position = 0;
-                                    using (MagickImage image = new MagickImage(ms))
-                                    {
-                                        pbx.Image = image.ToBitmap();
-                                    }
-                                }
-                                else
-                                {
-                                    pbx.Image = Image.FromStream(ms);
-                                }
-                            }
-                        }
-                    }
-                    //Si no tiene http, se lo maneja como un archivo local
-                    else
-                    {
-                        using (FileStream fs = new FileStream(ruta, FileMode.Open, FileAccess.Read))
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            fs.CopyTo(ms);
-                            ms.Position = 0;
-                            string extension = Path.GetExtension(ruta).ToLower();
+                Image nuevaImagen;
 
-                            if (extension == ".webp")
-                            {
-                                using (MagickImage image = new MagickImage(ms))
-                                {
-                                    pbx.Image = image.ToBitmap();
-                                }
-                            }
-                            else
-                            {
-                                pbx.Load(ruta);
-                            }
-                        }
+                if (ruta.ToLower().Contains("http"))
+                {
+                    byte[] data = httpClient.GetByteArrayAsync(ruta).ConfigureAwait(false).GetAwaiter().GetResult();
+                    using (MemoryStream ms = new MemoryStream(data))
+                    {
+                        nuevaImagen = DecodificarImagen(ms);
                     }
                 }
                 else
                 {
-                    pbx.Image = Properties.Resources.imagenNoEncontrada;
+                    if (!File.Exists(ruta))
+                    {
+                        AsignarImagen(pbx, Properties.Resources.imagenNoEncontrada);
+                        return;
+                    }
+
+                    using (FileStream fs = new FileStream(ruta, FileMode.Open, FileAccess.Read))
+                    {
+                        nuevaImagen = DecodificarImagen(fs);
+                    }
+                }
+
+                AsignarImagen(pbx, nuevaImagen);
+            }
+            catch
+            {
+                AsignarImagen(pbx, Properties.Resources.imagenNoEncontrada);
+            }
+        }
+
+        private static Image DecodificarImagen(Stream stream)
+        {
+            using (SKBitmap bitmap = SKBitmap.Decode(stream))
+            {
+                if (bitmap == null)
+                    throw new InvalidOperationException("No se pudo decodificar la imagen.");
+
+                return ConvertirABitmap(bitmap);
+            }
+        }
+
+        private static Bitmap ConvertirABitmap(SKBitmap source)
+        {
+            if (source.ColorType != SKColorType.Bgra8888)
+            {
+                using (SKBitmap converted = source.Copy(SKColorType.Bgra8888))
+                {
+                    return CopiarPixeles(converted);
                 }
             }
-            catch (Exception)
-            {
-                pbx.Image = Properties.Resources.imagenNoEncontrada;
 
+            return CopiarPixeles(source);
+        }
+
+        private static Bitmap CopiarPixeles(SKBitmap source)
+        {
+            int width = source.Width;
+            int height = source.Height;
+            int srcStride = source.RowBytes;
+
+            Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            System.Drawing.Imaging.BitmapData data = bmp.LockBits(
+                new Rectangle(0, 0, width, height),
+                System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            try
+            {
+                int dstStride = data.Stride;
+                int bytesPerRow = Math.Min(srcStride, dstStride);
+                byte[] rowBuffer = new byte[bytesPerRow];
+                IntPtr srcPtr = source.GetPixels();
+
+                for (int y = 0; y < height; y++)
+                {
+                    IntPtr srcRow = IntPtr.Add(srcPtr, y * srcStride);
+                    IntPtr dstRow = IntPtr.Add(data.Scan0, y * dstStride);
+                    System.Runtime.InteropServices.Marshal.Copy(srcRow, rowBuffer, 0, bytesPerRow);
+                    System.Runtime.InteropServices.Marshal.Copy(rowBuffer, 0, dstRow, bytesPerRow);
+                }
             }
+            finally
+            {
+                bmp.UnlockBits(data);
+            }
+
+            return bmp;
+        }
+
+        private static void AsignarImagen(PictureBox pbx, Image nuevaImagen)
+        {
+            Image anterior = pbx.Image;
+            pbx.Image = nuevaImagen;
+
+            if (anterior != null && anterior != Properties.Resources.imagenNoEncontrada)
+                anterior.Dispose();
         }
 
         public static bool validarNomDesc(TextBox textbox)

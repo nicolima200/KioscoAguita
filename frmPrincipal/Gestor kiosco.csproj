@@ -105,9 +105,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Magick.NET.Core" Version="14.10.1" />
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.1" />
-    <PackageReference Include="Magick.NET.SystemDrawing" Version="8.0.14" />
+    <PackageReference Include="SkiaSharp" Version="4.151.2" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="10.0.10" />
     <PackageReference Include="Obfuscar" Version="2.2.50" PrivateAssets="all" />
     <PackageReference Include="SourceGear.sqlite3" Version="3.53.3" />
