@@ -80,6 +80,31 @@ namespace service
             finally {datos.cerrarConexion();}
         }
 
+        public int contarPorUrlImagen(string urlImagen)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setConsulta(consulta.SqlContarPorUrlImagen);
+                datos.setParametro("@url", urlImagen);
+
+                datos.ejecutarConsulta();
+
+                if (datos.Lector.Read())
+                    return Convert.ToInt32(datos.Lector[0]);
+
+                return 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
         public void actualizarStock(int id, int nuevoStock)
         {
             AccesoDatos datos = new AccesoDatos();

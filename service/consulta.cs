@@ -33,6 +33,8 @@ namespace service
 
     private const string sqlActualizarStock = "UPDATE productos_inventario SET stock=@sto WHERE idProducto = @id";
 
+    private const string sqlContarPorUrlImagen = "SELECT COUNT(*) FROM productos_inventario WHERE urlImagen = @url";
+
     private const string sqlEliminarLogicoId = "UPDATE productos_inventario SET activo=0, eliminado=1 WHERE idProducto = @id";
     private const string sqlRestaurarLogicoId = "UPDATE productos_inventario SET activo=1, eliminado=0 WHERE idProducto = @id";
     private const string sqlEliminarDefinitivo = "BEGIN; DELETE FROM productos_inventario WHERE idProducto = @id; DELETE FROM productos WHERE id = @id; COMMIT;";
@@ -58,6 +60,8 @@ namespace service
         public static string SqlEliminarDefinitivo => sqlEliminarDefinitivo;
 
         public static string SqlActualizarStock => sqlActualizarStock;
+
+        public static string SqlContarPorUrlImagen => sqlContarPorUrlImagen;
 
         //public static string SqlBuscarId => sqlBuscarId;
 

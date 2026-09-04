@@ -160,6 +160,8 @@ namespace frmPrincipal
                 //Cada vez que se agrega o modifica, el producto queda activo
                 producto.Activo = 1;
 
+                //Guardamos la url anterior para poder liberar el archivo si deja de usarse
+                string urlImagenAnterior = producto.UrlImagen;
 
                 
                     if (archivo != null && !(txbUrlImagen.Text.ToLower().Contains("http")))
@@ -186,11 +188,13 @@ namespace frmPrincipal
                     if (producto.Id == 0) // id== 0 significa producto nuevo
                     {
                         productoService.agregar(producto);
+                        eliminarImagenHuerfana(urlImagenAnterior);
                         MessageBox.Show("Producto agregado exitosamente.", "Alta de producto");
                     }
                     else
                     {
                         productoService.modificar(producto);
+                        eliminarImagenHuerfana(urlImagenAnterior);
                         MessageBox.Show("Producto modificado exitosamente.", "Modificación");
                     }
 
@@ -368,6 +372,33 @@ namespace frmPrincipal
             producto.UrlImagen = rutaAchivoNuevo;
             return true;
         }
+
+        private void eliminarImagenHuerfana(string urlAnterior)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(urlAnterior)) return;
+                if (urlAnterior.ToLower().Contains("http")) return; //las URLs externas no se borran
+                if (urlAnterior.Equals(producto.UrlImagen, StringComparison.OrdinalIgnoreCase)) return; //la imagen sigue en uso
+
+                //Si otro producto usa la misma imagen, no se borra
+                ProductoService productoService = new ProductoService();
+                if (productoService.contarPorUrlImagen(urlAnterior) > 0) return;
+
+                //Solo se borran archivos dentro de la carpeta de imágenes
+                string carpeta = Path.GetFullPath(ConfigurationManager.AppSettings["images-folder"] ?? "imágenes");
+                string rutaCompleta = Path.GetFullPath(urlAnterior);
+                if (!rutaCompleta.StartsWith(carpeta, StringComparison.OrdinalIgnoreCase)) return;
+
+                if (File.Exists(rutaCompleta))
+                    File.Delete(rutaCompleta);
+            }
+            catch
+            {
+                //Si no se puede liberar la imagen anterior, no interrumpe el guardado
+            }
+        }
+
         private bool guardarImagenWeb()
         {
             //URL
