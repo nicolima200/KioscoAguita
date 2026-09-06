@@ -10,7 +10,33 @@ namespace service
         private SqliteCommand comando;
         private SqliteDataReader lector;
 
-        private string DbPath= Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DBKiosco");
+        private static readonly string DbPath = RutaDbGarantizada();
+
+        /// <summary>
+        /// La DB vive en %ProgramData%\KioscoAguita para sobrevivir a updates del MSI.
+        /// Orden de seed: DB vieja junto al exe (migra datos) → seed embebido en Resources.
+        /// </summary>
+        private static string RutaDbGarantizada()
+        {
+            string dir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "KioscoAguita");
+            string ruta = Path.Combine(dir, "DBKiosco");
+
+            if (!File.Exists(ruta))
+            {
+                Directory.CreateDirectory(dir);
+
+                string vieja = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DBKiosco");
+
+                if (File.Exists(vieja))
+                    File.Copy(vieja, ruta);
+                else
+                    File.WriteAllBytes(ruta, Properties.Resources.DBKiosco);
+            }
+
+            return ruta;
+        }
         
         public SqliteDataReader Lector => lector;
 

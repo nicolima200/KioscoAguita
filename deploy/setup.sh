@@ -35,6 +35,14 @@ sudo mkdir -p ${APP_DIR}
 sudo cp -r publish/* ${APP_DIR}/
 sudo chown -R kiosco:kiosco ${APP_DIR}
 
+# --- 3b. Copiar actualizaciones del cliente ---
+echo "[3b/6] Copiando actualizaciones del cliente..."
+sudo mkdir -p /opt/kiosco-updates
+if [ -d updates ]; then
+    sudo cp -r updates/* /opt/kiosco-updates/
+fi
+sudo chown -R www-data:www-data /opt/kiosco-updates
+
 # --- 4. Instalar y configurar Nginx ---
 echo "[4/6] Configurando Nginx..."
 if ! command -v nginx &> /dev/null; then

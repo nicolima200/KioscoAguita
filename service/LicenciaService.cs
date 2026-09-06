@@ -26,8 +26,15 @@ namespace service
         }
         private static readonly HttpClient cliente = new HttpClient()
         {
-            Timeout = TimeSpan.FromSeconds(8)
+            Timeout = TimeSpan.FromSeconds(30)
         };
+
+        static LicenciaService()
+        {
+            // Windows 7 may not select TLS 1.2 automatically for .NET Framework.
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+        }
+
         private static readonly string CarpetaDatos =
     Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -36,9 +43,21 @@ namespace service
 
         public async Task<string> ActivarAsync(string email, string password)
         {
-            HttpResponseMessage respuesta = await cliente.PostAsJsonAsync(
-                $"{UrlBase}/activar",
-                new { email, password });
+            HttpResponseMessage respuesta;
+            try
+            {
+                respuesta = await cliente.PostAsJsonAsync(
+                    $"{UrlBase}/activar",
+                    new { email, password });
+            }
+            catch (TaskCanceledException)
+            {
+                throw new Exception("No se pudo conectar con el servidor de licencias. Verificá tu conexión a Internet e intentá nuevamente.");
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception("No se pudo conectar con el servidor de licencias. Verificá tu conexión a Internet e intentá nuevamente.");
+            }
 
             if (respuesta.StatusCode == HttpStatusCode.Unauthorized)
                 throw new Exception("Email o contraseña incorrectos.");

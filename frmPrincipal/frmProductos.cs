@@ -44,6 +44,10 @@ namespace frmPrincipal
                 tsmGestionar.Visible = true;
                 tsmRegistroVentas.Visible = true;
                 lblAtajos.Text = "F3 - Buscar || F4 - Agregar producto || F10 - Cobrar";
+
+                var tsmBuscarActualizaciones = new ToolStripMenuItem("Buscar actualizaciones");
+                tsmBuscarActualizaciones.Click += (s, ev) => ActualizacionService.Chequear(true);
+                menuStrip1.Items.Add(tsmBuscarActualizaciones);
             }
             else
             {
@@ -71,6 +75,8 @@ namespace frmPrincipal
                 //tbxCantidad.Text = "1";
                 configurarDgvVenta();
             }
+
+            ActualizacionService.Chequear(false);
         }
 
         private void obtenerTamañosFrmYDgv()

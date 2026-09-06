@@ -426,6 +426,7 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/deploy/client/
 
 # PEM
 clave-privada.pem
