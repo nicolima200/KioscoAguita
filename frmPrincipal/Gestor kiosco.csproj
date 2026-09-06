@@ -133,6 +133,12 @@
     <Compile Include="frmCobro.Designer.cs">
       <DependentUpon>frmCobro.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmConfigurarPasswordInicial.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConfigurarPasswordInicial.Designer.cs">
+      <DependentUpon>frmConfigurarPasswordInicial.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmLogin.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,6 +162,12 @@
     </Compile>
     <Compile Include="frmRegistroVentas.Designer.cs">
       <DependentUpon>frmRegistroVentas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmRestablecerPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRestablecerPassword.Designer.cs">
+      <DependentUpon>frmRestablecerPassword.cs</DependentUpon>
     </Compile>
     <Compile Include="ActualizacionService.cs" />
     <Compile Include="Helper.cs" />

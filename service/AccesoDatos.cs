@@ -35,7 +35,84 @@ namespace service
                     File.WriteAllBytes(ruta, Properties.Resources.DBKiosco);
             }
 
+            AplicarMigraciones(ruta);
+
             return ruta;
+        }
+
+        private static void AplicarMigraciones(string ruta)
+        {
+            using (SqliteConnection conexion = new SqliteConnection($"Data Source={ruta};Foreign Keys=True"))
+            {
+                conexion.Open();
+
+                bool existeColumna = false;
+
+                using (SqliteCommand cmd = new SqliteCommand("PRAGMA table_info(usuarios)", conexion))
+                using (SqliteDataReader lector = cmd.ExecuteReader())
+                {
+                    while (lector.Read())
+                    {
+                        if (string.Equals(lector.GetString(1), "debeConfigurarPassword", StringComparison.OrdinalIgnoreCase))
+                        {
+                            existeColumna = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Primera ejecucion con el esquema nuevo: forzar reset de la cuenta admin.
+                // Solo corre cuando se agrega la columna, nunca en cada arranque.
+                if (!existeColumna)
+                {
+                    using (SqliteCommand cmd = new SqliteCommand(
+                        "ALTER TABLE usuarios ADD COLUMN debeConfigurarPassword INTEGER NOT NULL DEFAULT 0", conexion))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    ForzarResetAdmin(conexion);
+                }
+            }
+        }
+
+        private static void ForzarResetAdmin(SqliteConnection conexion)
+        {
+            int idAdmin = 0;
+
+            using (SqliteCommand cmd = new SqliteCommand(
+                "SELECT id FROM usuarios WHERE nombre = 'admin' COLLATE NOCASE LIMIT 1", conexion))
+            using (SqliteDataReader lector = cmd.ExecuteReader())
+            {
+                if (lector.Read())
+                    idAdmin = lector.GetInt32(0);
+            }
+
+            if (idAdmin > 0)
+            {
+                using (SqliteCommand cmd = new SqliteCommand(
+                    "UPDATE usuarios SET pass = '', debeConfigurarPassword = 1 WHERE id = @id", conexion))
+                {
+                    cmd.Parameters.AddWithValue("@id", idAdmin);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            else
+            {
+                try
+                {
+                    using (SqliteCommand cmd = new SqliteCommand(
+                        "INSERT INTO usuarios (nombre, tipousuario, pass, debeConfigurarPassword) VALUES ('admin', 'Admin', '', 1)", conexion))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (SqliteException)
+                {
+                    // Esquema con columnas NOT NULL adicionales: no se puede insertar sin conocerlas.
+                    // La proxima ejecucion reintenta; si no existe admin el login queda bloqueado a proposito.
+                }
+            }
         }
         
         public SqliteDataReader Lector => lector;

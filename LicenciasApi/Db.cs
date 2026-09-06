@@ -25,7 +25,26 @@ public static class Db
             MercadoPagoSubscriptionId TEXT,
             Estado TEXT NOT NULL DEFAULT 'activa',
             FechaVencimiento TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS CodigosRestablecimientoAdmin (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            LicenciaId INTEGER NOT NULL,
+            CodigoHash TEXT NOT NULL,
+            CreadoEnUtc TEXT NOT NULL,
+            VenceEnUtc TEXT NOT NULL,
+            AutorizadoEnUtc TEXT,
+            TicketHash TEXT,
+            TicketVenceEnUtc TEXT,
+            UsadoEnUtc TEXT,
+            CreadoPor TEXT NOT NULL,
+            IntentosFallidos INTEGER NOT NULL DEFAULT 0);
         ";
         comando.ExecuteNonQuery();
+
+        var indice = connection.CreateCommand();
+        indice.CommandText = @"
+            CREATE INDEX IF NOT EXISTS idx_codigos_licencia
+            ON CodigosRestablecimientoAdmin (LicenciaId, UsadoEnUtc, VenceEnUtc);
+        ";
+        indice.ExecuteNonQuery();
     }
 }

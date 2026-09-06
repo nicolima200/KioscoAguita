@@ -8,12 +8,20 @@ namespace service
 {
     public class consultasUsuario
     {
-        private const string sqlBuscarUsuario = "SELECT id, nombre, tipousuario, pass from usuarios WHERE nombre = @usuario";
+        private const string sqlBuscarAdmin = "SELECT id, nombre, tipousuario, pass, debeConfigurarPassword FROM usuarios WHERE nombre = @usuario COLLATE NOCASE LIMIT 1";
 
-        private const string sqlActualizarPass = "UPDATE usuarios SET pass = @pass WHERE id = @id";
+        private const string sqlRequiereConfigurar = "SELECT debeConfigurarPassword, pass FROM usuarios WHERE nombre = @usuario COLLATE NOCASE LIMIT 1";
 
-        public static string SqlBuscarUsuario => sqlBuscarUsuario;
+        private const string sqlConfigurarPassword = "UPDATE usuarios SET pass = @pass, debeConfigurarPassword = @flag WHERE nombre = @usuario COLLATE NOCASE";
 
-        public static string SqlActualizarPass => sqlActualizarPass;
+        private const string sqlPrepararRestablecimiento = "UPDATE usuarios SET pass = '', debeConfigurarPassword = 1 WHERE nombre = @usuario COLLATE NOCASE";
+
+        public static string SqlBuscarAdmin => sqlBuscarAdmin;
+
+        public static string SqlRequiereConfigurar => sqlRequiereConfigurar;
+
+        public static string SqlConfigurarPassword => sqlConfigurarPassword;
+
+        public static string SqlPrepararRestablecimiento => sqlPrepararRestablecimiento;
     }
 }

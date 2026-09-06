@@ -19,6 +19,7 @@ namespace frmPrincipal
         {
             InitializeComponent();
         }
+
         private void btnSalir_Click(object sender, EventArgs e)
         {
             Close();
@@ -41,7 +42,7 @@ namespace frmPrincipal
             };
 
             Sesion.UsuarioActual = vendedor;
-            this.Hide();   
+            this.Hide();
             FrmProductos frmProductos = new FrmProductos();
             frmProductos.ShowDialog();
 
@@ -49,24 +50,24 @@ namespace frmPrincipal
             this.Show();
             btnAccederAdmin.Enabled = true;
             btnAccederSoloVenta.Enabled = true;
-            tbxUsuario.Focus();
+            tbxPassword.Focus();
         }
 
         private void btnAccederAdmin_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(tbxUsuario.Text) || string.IsNullOrEmpty(tbxPassword.Text))
+            if (string.IsNullOrEmpty(tbxPassword.Text))
             {
-                MessageBox.Show("Debe ingresar un usuario y contraseña válidos.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe ingresar la contraseña de administrador.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             UsuarioService usuarioService = new UsuarioService();
 
-            Usuario usuarioActual = usuarioService.login(tbxUsuario.Text, tbxPassword.Text);
+            Usuario usuarioActual = usuarioService.LoginAdmin(tbxPassword.Text);
 
             if (usuarioActual == null)
             {
-                MessageBox.Show("Usuario o contraseña inválidos.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Contraseña inválida.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 lblDatosInvalidos.Visible = true;
                 return;
             }
@@ -77,7 +78,6 @@ namespace frmPrincipal
             FrmProductos frmProductos = new FrmProductos();
             frmProductos.ShowDialog();
 
-
             Sesion.UsuarioActual = null;
             tbxPassword.Clear();
             chkMostrarPassword.Checked = false;
@@ -87,13 +87,22 @@ namespace frmPrincipal
             tbxPassword.Focus();
         }
 
-        private void deshabilitarYOcultar(bool ocultar=true)
+        private void lblOlvidarPassword_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            using (var frm = new frmRestablecerPassword())
+            {
+                frm.ShowDialog(this);
+            }
+
+            tbxPassword.Focus();
+        }
+
+        private void deshabilitarYOcultar(bool ocultar = true)
         {
             btnAccederAdmin.Enabled = !ocultar;
             btnAccederSoloVenta.Enabled = !ocultar;
 
             if (ocultar) this.Hide(); else this.Show();
         }
-
     }
 }

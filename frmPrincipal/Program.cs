@@ -19,7 +19,16 @@ namespace frmPrincipal
 
                 if (!VerificarLicencia())
                     return;
-                
+
+                if (new UsuarioService().RequiereConfigurarPassword())
+                {
+                    using (var frm = new frmConfigurarPasswordInicial())
+                    {
+                        if (frm.ShowDialog() != DialogResult.OK)
+                            return;
+                    }
+                }
+
                 Application.Run(new frmLogin());
             }
             catch (Exception ex)

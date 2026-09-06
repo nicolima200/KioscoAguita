@@ -76,6 +76,80 @@ namespace service
             public string Token { get; set; }
         }
 
+        private class RespuestaTicket
+        {
+            public string Ticket { get; set; }
+        }
+
+        private const string MensajeSinConexion = "No se pudo conectar con el servidor de licencias. Verificá tu conexión a Internet e intentá nuevamente.";
+
+        public async Task<string> AutorizarRestablecimientoAsync(string codigo)
+        {
+            string token = LeerTokenGuardado();
+            if (token == null)
+                throw new Exception("No hay una licencia activa guardada en este equipo.");
+
+            HttpRequestMessage pedido = new HttpRequestMessage(HttpMethod.Post, $"{UrlBase}/restablecimientos/autorizar");
+            pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            pedido.Content = JsonContent.Create(new { codigo });
+
+            HttpResponseMessage respuesta;
+            try
+            {
+                respuesta = await cliente.SendAsync(pedido);
+            }
+            catch (TaskCanceledException)
+            {
+                throw new Exception(MensajeSinConexion);
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception(MensajeSinConexion);
+            }
+
+            if (respuesta.StatusCode == HttpStatusCode.Unauthorized)
+                throw new Exception("La licencia no está activa o venció.");
+
+            if (!respuesta.IsSuccessStatusCode)
+                throw new Exception("No se pudo validar el código. Verificá que sea correcto y volvé a intentar.");
+
+            RespuestaTicket resultado = await respuesta.Content.ReadFromJsonAsync<RespuestaTicket>();
+            return resultado.Ticket;
+        }
+
+        public async Task ConfirmarRestablecimientoAsync(string ticket)
+        {
+            string token = LeerTokenGuardado();
+            if (token == null)
+                throw new Exception("No hay una licencia activa guardada en este equipo.");
+
+            HttpRequestMessage pedido = new HttpRequestMessage(HttpMethod.Post, $"{UrlBase}/restablecimientos/confirmar");
+            pedido.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            pedido.Content = JsonContent.Create(new { ticket });
+
+            HttpResponseMessage respuesta;
+            try
+            {
+                respuesta = await cliente.SendAsync(pedido);
+            }
+            catch (TaskCanceledException)
+            {
+                throw new Exception(MensajeSinConexion);
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception(MensajeSinConexion);
+            }
+
+            // Un ticket ya consumido o inexistente no se reintenta ni se reporta como error:
+            // el reset local ya se completó.
+            if (respuesta.StatusCode == HttpStatusCode.NotFound)
+                return;
+
+            if (!respuesta.IsSuccessStatusCode)
+                throw new Exception("No se pudo confirmar el restablecimiento. El código venció o ya fue usado.");
+        }
+
         public LicenciaInfo ValidarToken(string token)
         {
             RSA rsa = CargarClavePublica();
